@@ -1,7 +1,9 @@
 import { useState } from "react";
 import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
-import { auth } from "../lib/firebase";
+import { setDoc, doc, serverTimestamp } from "firebase/firestore";
+import { auth, db } from "../lib/firebase";
 import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
 export default function Signup() {
   const [email, setEmail] = useState("");
@@ -27,6 +29,14 @@ export default function Signup() {
         password
       );
       if (name) await updateProfile(userCredential.user, { displayName: name });
+      await setDoc(doc(db, "users", userCredential.user.uid), {
+        uid: userCredential.user.uid,
+        name,
+        email,
+        createdAt: serverTimestamp(),
+      });
+      setName("");
+      setEmail("");
       navigate("/");
     } catch (err) {
       console.log(err.code);
