@@ -12,10 +12,13 @@ import {
 } from "firebase/firestore";
 import { db } from "../lib/firebase";
 import { useAuth } from "../context/AuthContext";
+import { useModal } from "../context/ModalContext";
+import DeleteConfirm from "../components/DeleteConfirm";
 
 export default function NotesList() {
   const [notes, setNotes] = useState([]);
   const { user } = useAuth();
+  const { openModal, closeModal } = useModal();
 
   useEffect(() => {
     const q = query(
@@ -33,7 +36,28 @@ export default function NotesList() {
   }, [user.uid]);
 
   const handleDelete = async (id) => {
-    await deleteDoc(doc(db, "notes", id));
+    try {
+      await deleteDoc(doc(db, "notes", id));
+    } catch (err) {
+      console.error("Silme hatası:", err);
+      alert("Not silinirken bir hata oluştu.");
+    }
+  };
+
+  const requestDelete = (note) => {
+    openModal({
+      content: (
+        <DeleteConfirm
+          title={`"${note.title || "Başlıksız"}" silinsin mi?`}
+          onConfirm={() => {
+            handleDelete(note.id);
+            closeModal();
+          }}
+          onCancel={closeModal}
+        />
+      ),
+      ariaLabel: "Delete confirmation dialog",
+    });
   };
 
   const handleUpdate = async (id, currentContent) => {
@@ -79,7 +103,7 @@ export default function NotesList() {
                 Düzenle
               </button>
               <button
-                onClick={() => handleDelete(n.id)}
+                onClick={() => requestDelete(n)}
                 className="w-full rounded-xl border border-error px-3 py-2 text-error transition hover:bg-error hover:text-white sm:w-auto cursor-pointer"
               >
                 Sil
