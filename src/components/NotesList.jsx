@@ -14,6 +14,7 @@ import { db } from "../lib/firebase";
 import { useAuth } from "../context/AuthContext";
 import { useModal } from "../context/ModalContext";
 import DeleteConfirm from "../components/DeleteConfirm";
+import UpdateContent from "../components/UpdateContent";
 
 export default function NotesList() {
   const [notes, setNotes] = useState([]);
@@ -60,9 +61,8 @@ export default function NotesList() {
     });
   };
 
-  const handleUpdate = async (id, currentContent) => {
-    const newContent = window.prompt("Yeni içerik:", currentContent ?? "");
-    if (newContent == null) return; // iptal
+  const handleUpdate = async (id, newContent) => {
+    if (!newContent?.trim()) return; // boş içerik olmasın
     try {
       await updateDoc(doc(db, "notes", id), {
         content: newContent,
@@ -72,6 +72,23 @@ export default function NotesList() {
       console.error("updateDoc error:", err);
       alert("Güncelleme yapılamadı.");
     }
+  };
+
+  const requestUpdate = (note) => {
+    openModal({
+      content: (
+        <UpdateContent
+          title={`"${note.title}" güncellensin mi?`}
+          defaultValue={note.content}
+          onConfirm={(newValue) => {
+            handleUpdate(note.id, newValue);
+            closeModal();
+          }}
+          onCancel={closeModal}
+        />
+      ),
+      ariaLabel: "Update content dialog",
+    });
   };
 
   return (
@@ -91,13 +108,11 @@ export default function NotesList() {
             <h4 className="line-clamp-1 font-[600] text-lg text-text-primary">
               {n.title || "Başlıksız"}
             </h4>
-            <p className="mt-1 text-text-secondary">
-              {n.content}
-            </p>
+            <p className="mt-1 text-text-secondary">{n.content}</p>
 
             <div className="mt-4 flex flex-col gap-2 sm:flex-row">
               <button
-                onClick={() => handleUpdate(n.id, n.content)}
+                onClick={() => requestUpdate(n)}
                 className="w-full rounded-xl bg-primary px-3 py-2 text-white transition hover:bg-primary-hover sm:w-auto cursor-pointer"
               >
                 Düzenle

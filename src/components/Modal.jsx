@@ -39,7 +39,7 @@ export default function Modal({ isOpen, onClose, children, ariaLabel = "Modal wi
       >
         <button
           onClick={onClose}
-          className="absolute right-3 top-3 inline-flex h-9 w-9 items-center justify-center rounded-full text-gray-500 hover:bg-gray-100 hover:text-gray-800 focus:outline-none focus:ring"
+          className="hidden absolute right-3 top-3 md:inline-flex h-9 w-9 items-center justify-center rounded-full text-gray-500 hover:bg-gray-100 hover:text-gray-800 focus:outline-none focus:ring"
           aria-label="Close"
         >
           ✕
