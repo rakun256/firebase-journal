@@ -15,11 +15,13 @@ import { useAuth } from "../context/AuthContext";
 import { useModal } from "../context/ModalContext";
 import DeleteConfirm from "../components/DeleteConfirm";
 import UpdateContent from "../components/UpdateContent";
+import { useToast } from "../context/ToastContext";
 
 export default function NotesList() {
   const [notes, setNotes] = useState([]);
   const { user } = useAuth();
   const { openModal, closeModal } = useModal();
+  const { showToast } = useToast();
 
   useEffect(() => {
     const q = query(
@@ -42,6 +44,7 @@ export default function NotesList() {
     } catch (err) {
       console.error("Silme hatası:", err);
       alert("Not silinirken bir hata oluştu.");
+      showToast("Not silinirken bir hata oluştu.", "error");
     }
   };
 
@@ -52,6 +55,7 @@ export default function NotesList() {
           title={`"${note.title || "Başlıksız"}" silinsin mi?`}
           onConfirm={() => {
             handleDelete(note.id);
+            showToast("Not silindi.", "success");
             closeModal();
           }}
           onCancel={closeModal}
@@ -71,6 +75,7 @@ export default function NotesList() {
     } catch (err) {
       console.error("updateDoc error:", err);
       alert("Güncelleme yapılamadı.");
+      showToast("Not güncellenirken bir hata oluştu.", "error");
     }
   };
 
@@ -82,6 +87,7 @@ export default function NotesList() {
           defaultValue={note.content}
           onConfirm={(newValue) => {
             handleUpdate(note.id, newValue);
+            showToast("Not güncellendi.", "success");
             closeModal();
           }}
           onCancel={closeModal}

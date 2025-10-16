@@ -4,6 +4,7 @@ import { setDoc, doc, serverTimestamp } from "firebase/firestore";
 import { auth, db } from "../lib/firebase";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { useToast } from "../context/ToastContext";
 
 export default function Signup() {
   const [email, setEmail] = useState("");
@@ -11,6 +12,7 @@ export default function Signup() {
   const [name, setName] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
+  const { showToast } = useToast();
   const navigate = useNavigate();
 
   const handleSignup = async (e) => {
@@ -37,9 +39,11 @@ export default function Signup() {
       });
       setName("");
       setEmail("");
+      showToast("Account created successfully!", "success");
       navigate("/");
     } catch (err) {
       console.log(err.code);
+      showToast("An error occurred.", "error");
       let msg = "An error occured.";
       if (err.code === "auth/email-already-in-use")
         msg = "This email is already registered.";

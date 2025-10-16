@@ -3,12 +3,14 @@ import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../lib/firebase";
 import { Link, useNavigate, Navigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { useToast } from "../context/ToastContext";
 
 export default function Login() {
   const { user } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const { showToast } = useToast();
   const navigate = useNavigate();
 
   if (user) return <Navigate to="/" replace />;
@@ -18,8 +20,10 @@ export default function Login() {
     setError("");
     try {
       await signInWithEmailAndPassword(auth, email, password);
+      showToast("Logged in successfully!", "success");
       navigate("/");
     } catch (e) {
+      showToast(e.message, "error");
       setError(e.message);
     }
   };

@@ -2,11 +2,13 @@ import { useState } from "react";
 import { addDoc, collection, serverTimestamp } from "firebase/firestore";
 import { db } from "../lib/firebase";
 import { useAuth } from "../context/AuthContext";
+import { useToast } from "../context/ToastContext";
 
 export default function AddNote() {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const { user } = useAuth();
+  const { showToast } = useToast();
 
   const handleAdd = async (e) => {
     e.preventDefault();
@@ -37,6 +39,7 @@ export default function AddNote() {
       />
       <button
         type="submit"
+        onClick={() => showToast("Not eklendi!", "success")}
         className="inline-flex items-center justify-center rounded-xl bg-primary px-4 py-2 text-white shadow-sm shadow-shadow transition hover:bg-primary-hover cursor-pointer"
       >
         Not Ekle
